@@ -1,8 +1,39 @@
+/*
+	
+ SENG 440 Project
+ July 19th, 2013
+ 
+*/
 
-int readRGBImage();
+#define DATA_OFFSET 54
+#define WIDTH_OFFSET 18
 
-int writeRGBImage();
+/*
+* Structure to represent RGB pixel values. Note: BMP files store them in the order b,g,r
+*/
+typedef struct {
+	unsigned char b;
+	unsigned char g;
+	unsigned char r;  
 
-int readYCCImages();
+} Pixel;
 
-int writeYCCImages();
+/*
+* Structure to represent an image
+*/
+typedef struct {
+	int numPixels;
+	Pixel* pixels;
+} Image;
+
+/*
+* Reads pixel data from an image file
+*/
+Image readImage(char*);
+
+/*
+* Write pixel data to an image file
+*/
+void writeImage(char*, Image);
+
+
