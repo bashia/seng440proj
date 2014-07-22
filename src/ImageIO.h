@@ -5,6 +5,7 @@
  
 */
 
+#define SIZE_OFFSET 2
 #define DATA_OFFSET 54
 #define WIDTH_OFFSET 18
 
@@ -22,6 +23,8 @@ typedef struct {
 * Structure to represent an image
 */
 typedef struct {
+	int width;
+	int height;
 	int numPixels;
 	Pixel* pixels;
 } Image;
