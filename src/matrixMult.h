@@ -72,8 +72,9 @@ int absMult(int a, int b, int lower, int upper)
 //TODO: integrate absorbing arithmetic to the calculations.
 int VectbyMat(Vector in, Matrix matrix, Vector * out)
 {
+	/* Does not compile
 	out->r = matrix[0][0] * in.r + matrix[1][0] * in.g + matrix[2][0] * in.b;
 	out->g = matrix[0][1] * in.r + matrix[1][1] * in.g + matrix[2][1] * in.b;
-	out->b = matrix[0][2] * in.r + matrix[1][2] * in.g + matrix[2][2] * in.b;
+	out->b = matrix[0][2] * in.r + matrix[1][2] * in.g + matrix[2][2] * in.b;*/
 	return 0;
 }
