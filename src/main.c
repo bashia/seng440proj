@@ -135,6 +135,16 @@ int RGBtoYCC(char* filename)
 		// Once for each component YCC image
 		// 
 	}
+	
+	//writeImage- I'll figure this out later
+	// write RGB approximation of YCC components (each in an Image struct) to the new filenames
+
+	free(outpathy);
+	free(outpathcb);
+	free(outpathcr);
+	
+	return 0;
+}
 
 	//writeImage- I'll figure this out later
 	// write RGB approximation of YCC components (each in an Image struct) to the new filenames
@@ -142,6 +152,33 @@ int RGBtoYCC(char* filename)
 	free(outpathy);
 	free(outpathcb);
 	free(outpathcr);
+
+int YCCtoRGB(char* yfile, char* cbfile, char* crfile)
+{
+	char* outpath = "YccOutput";
+	char* inpathy = yfile;
+	char* inpathcb = cbfile;
+	char* inpathcr = crfile;
+	
+	Image outimage;
+	Image inimagey;
+	Image inimagecb;
+	Image inimagecr;
+	Matrix transmat;
+	inimagey = readImage(inpathy);
+	inimagecb = readImage(inpathcb);
+	inimagecr = readImage(inpathcr);
+
+	int i;
+	for(i=0;i<inimagey.numPixels;i++) //Is the size of the luminance component the size of the RGB image?
+	{
+		Pixel tempPixel;
+		
+		YCCCompstoRGB(inimagey.pixels[i],inimagecb.pixels[i],inimagecr.pixels[i],&outimage.pixels[i])
+	}
+		
+	//writeImage- I'll figure this out later
+	// write RGB Image to file
 
 	return 0;
 }
