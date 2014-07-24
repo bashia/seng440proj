@@ -4,21 +4,6 @@
 #include "ImageIO.h"
 #include "matrixMult.h"
 
-// type mismatch- I'll fix this later.
-int pixelTransform(Pixel in, Pixel* out)
-{
-	/* Does not compile
-	out->y = 16 + (65.481*in.r + 128.553*in.g + 24.966*in.b);
-	out->cb = 128 + (-37.797*in.r - 74.203*in.g + 112*in.b);
-	out->cr = 128 + (112*in.r - 93.786*in.g - 18.214*in.b);*/
-	return 0;
-}
-
-int YCCCompstoRGB(Pixel iny, Pixel incb, Pixel incr, Pixel* out)
-{
-	return 0;
-}
-
 /*
 
  Transforms an RGB image to YCbCr components. The colour saturation issues when doing the inverse
@@ -118,6 +103,8 @@ int YCCtoRGB(char* yfile, char* cbfile, char* crfile)
 	free(yImage.pixels);
 	free(cbImage.pixels);
 	free(crImage.pixels);
+
+	return 0;
 }
 
 int main(int argc, char* argv[])
