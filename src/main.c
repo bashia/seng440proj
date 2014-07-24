@@ -4,23 +4,42 @@
 #include "ImageIO.h"
 #include "matrixMult.h"
 
+unsigned char intToPixel(int integer)
+{
+	if(integer > 255)
+	{
+		return 255;
+	}
+	else if(integer < 0)
+	{
+		return 0;
+	}
+	return integer;
+}
 
 /*
-
- Transforms an RGB image to YCbCr components. The colour saturation issues when doing the inverse
- is due to the loss of information when casting the floating point values to integers. Hopefully this
- issue can be elimated with fixed point arithemtic. The maximum green values seen in the inverse 
- transform is due to the lack of saturation arithmetic The commented code in this function does the 
- inverse transform using the floating point values and it outputs the correct image.
-
+ Transforms an RGB image to YCbCr components. 
 */
 void RGBtoYCC(char* filename)
-{
+{	
+	int yRConst = 2498396;
+	int yGConst = 4904878;
+	int yBConst = 952566;
+
+	int cbRConst = 2498407;
+	int cbGConstA = 4904867;
+	int cbGConstB = 1437774;
+	int cbBConst = 7403274;
+
+	int crRConst =  5857443;
+	int crGConstA = 4904877;
+	int crGConstB = 4272902;
+	int crBConst =   952567;
+
 	Image rgb = readImage(filename);
 	Image yImage;
 	Image cbImage;
 	Image crImage;
-	//Image inverse;
 
 	yImage.pixels = (Pixel*) malloc(sizeof(Pixel) * rgb.numPixels);
 	yImage.numPixels = rgb.numPixels;
@@ -37,44 +56,50 @@ void RGBtoYCC(char* filename)
 	crImage.width = rgb.width;
 	crImage.height = rgb.height;
 
-	/*inverse.pixels = (Pixel*) malloc(sizeof(Pixel) * rgb.numPixels);
-	inverse.numPixels = rgb.numPixels;
-	inverse.width = rgb.width;
-	inverse.height = rgb.height;*/
-
 	int i;
 	for(i = 0; i < rgb.numPixels; i++)
 	{
-		double y = (0.297832031 * rgb.pixels[i].r + 0.584706994 * rgb.pixels[i].g + 0.11355468 * rgb.pixels[i].b);
-		yImage.pixels[i].r = y;
-		yImage.pixels[i].g = y;
-		yImage.pixels[i].b = y;
+		int r = rgb.pixels[i].r;
+		int g = rgb.pixels[i].g;
+		int b = rgb.pixels[i].b;
+	
+		// Y values
+		int y = ((yRConst * r + yGConst * g + yBConst * b) >> 23) + 16;
+	
+		yImage.pixels[i].r = intToPixel(y);
+		yImage.pixels[i].g = intToPixel(y);
+		yImage.pixels[i].b = intToPixel(y);
+	
+		// Cb Values
+		int cb = (b * cbBConst - r * cbRConst - g * cbGConstA);
+		cb = cb >> 23;
 
-		double cb = (-0.297833292 * rgb.pixels[i].r - 0.584705764 * rgb.pixels[i].g + 0.882539056 * rgb.pixels[i].b);
-		cbImage.pixels[i].r = 0;
-		cbImage.pixels[i].g = (cb * 0.194207836);
-		cbImage.pixels[i].b = cb;
-
-		double cr = (0.698261648 * rgb.pixels[i].r - 0.584706847 * rgb.pixels[i].g - 0.1135548 * rgb.pixels[i].b);
-		crImage.pixels[i].r = cr;
-		crImage.pixels[i].g = (cr * 0.509369676);
-		crImage.pixels[i].b = 0;
-
-	 	//This code will out put an inverse transform using floating point calclations
-
-		/*double r = y + cr;
-		double g = y - (cb * 0.194207836) - (cr * 0.509369676);
-		double b = y + cb;
+		int cbGreenInt = -(cb * cbGConstB);
+		cbGreenInt = cbGreenInt >> 23;
+		cbGreenInt += 128;
+		int cbBlueInt = cb + 128;
 		
-		inverse.pixels[i].r = r;
-		inverse.pixels[i].g = g;
-		inverse.pixels[i].b = b;*/
-	}
+		cbImage.pixels[i].r = 0;
+		cbImage.pixels[i].g = intToPixel(cbGreenInt);
+		cbImage.pixels[i].b = intToPixel(cbBlueInt);
+
+		// Cr values
+		int cr = (crRConst * r - crGConstA * g - crBConst * b);
+		cr = cr >> 23;
+		
+		int crGreenInt = -(cr * crGConstB);
+		crGreenInt = crGreenInt >> 23;
+		crGreenInt += 128;
+		int crRedInt = cr + 128;
+	
+		crImage.pixels[i].r = intToPixel(crRedInt);
+		crImage.pixels[i].g = intToPixel(crGreenInt);
+		crImage.pixels[i].b = 0;
+	}	
 	
 	writeImage("outY.bmp", yImage);
 	writeImage("outCb.bmp", cbImage);
 	writeImage("outCr.bmp", crImage);
-	//writeImage("inverse.bmp", inverse);
 
 	free(rgb.pixels);
 }
@@ -94,9 +119,14 @@ int YCCtoRGB(char* yfile, char* cbfile, char* crfile)
 	int i;
 	for(i = 0; i < yImage.numPixels; i++)
 	{
-		rgbImage.pixels[i].r = yImage.pixels[i].r + crImage.pixels[i].r;
-		rgbImage.pixels[i].g = yImage.pixels[i].g - cbImage.pixels[i].g - crImage.pixels[i].g;
-		rgbImage.pixels[i].b = yImage.pixels[i].b + cbImage.pixels[i].b;
+
+		int r = yImage.pixels[i].r + crImage.pixels[i].r - 128 - 16;
+		int g = yImage.pixels[i].g + cbImage.pixels[i].g + crImage.pixels[i].g - 256 - 16;
+		int b = yImage.pixels[i].b + cbImage.pixels[i].b - 128 - 16;
+
+		rgbImage.pixels[i].r = intToPixel(r);
+		rgbImage.pixels[i].g = intToPixel(g);
+		rgbImage.pixels[i].b = intToPixel(b);
 	}
 	
 	writeImage("outRGB.bmp", rgbImage);
@@ -110,7 +140,7 @@ int YCCtoRGB(char* yfile, char* cbfile, char* crfile)
 
 int main(int argc, char* argv[])
 {
-
+	
 	if(argc == 2)
 	{
 		printf("RGB to YCC...\n");

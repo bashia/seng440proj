@@ -53,14 +53,14 @@ void writeImage(char* filename, Image image)
 	char header[] = {'B', 'M', /* Size*/ 0, 0, 0, 0, /*Reserved*/ 0, 0, 0, 0, /*Offset*/ 0x36, 0, 0, 0,
 		/*Header*/ 0x28, 0, 0, 0, /*Width*/ 0, 0, 0, 0, /*Height*/ 0, 0, 0, 0, /*Planes*/ 0, 0, 
 		/*BitCount*/ 0x18, 0, /*Rest*/ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-	
+
 	// Prepare header
 	int fileSize = (image.numPixels * 3) + DATA_OFFSET;
 	memcpy(&header[SIZE_OFFSET], &fileSize, sizeof(int));
 	memcpy(&header[WIDTH_OFFSET], &image.width, sizeof(int));
 	memcpy(&header[WIDTH_OFFSET] + sizeof(int), &image.height, sizeof(int));
 
-	// Write header and pixel data to the file
+	//  Write header and pixel data to the file
 	fwrite(header, sizeof(char), DATA_OFFSET, imageFile);
 	fwrite(image.pixels, sizeof(Pixel), image.numPixels, imageFile);
 	
