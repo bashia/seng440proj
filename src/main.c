@@ -4,6 +4,7 @@
 #include "ImageIO.h"
 #include "matrixMult.h"
 
+<<<<<<< HEAD
 unsigned char intToPixel(int integer)
 {
 	if(integer > 255)
@@ -16,6 +17,8 @@ unsigned char intToPixel(int integer)
 	}
 	return integer;
 }
+=======
+>>>>>>> 50c07f0a43da2d958855297d40de7c6698053d62
 
 /*
  Transforms an RGB image to YCbCr components. 
@@ -134,6 +137,8 @@ int YCCtoRGB(char* yfile, char* cbfile, char* crfile)
 	free(yImage.pixels);
 	free(cbImage.pixels);
 	free(crImage.pixels);
+
+	return 0;
 }
 
 int main(int argc, char* argv[])
