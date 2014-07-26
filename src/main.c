@@ -29,6 +29,16 @@ unsigned char intToPixel(int* integer)
 	return *integer;
 }
 
+unsigned char satAdd(int* a, int* b)
+{
+	
+}
+
+unsigned char satMult(int*a, int* b)
+{
+
+}
+
 /*
  Transforms an RGB image to YCbCr components. 
 */
@@ -138,7 +148,7 @@ void RGBtoYCC(char* filename)
 	
 
 	int i;
-	for(i = 1; i < rgb.numPixels; i += 2)
+	for(i = 2; i < rgb.numPixels; i += 2)
 	{
 		k = i + 1;
 		chromaI = i >> 1;
