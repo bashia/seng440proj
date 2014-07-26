@@ -75,6 +75,8 @@ void RGBtoYCC(char* filename)
 	int crB;
 	int crGreenIntB;
 
+	int tempint;
+
 
 			
 	rA = rgb.pixels[0].r;
@@ -87,14 +89,14 @@ void RGBtoYCC(char* filename)
 	
 	// Y values
 	yi = ((yRConst * rA + yGConst * gA + yBConst * bA) >> 23) + 16;
-	yImage.pixels[0].r = intToPixel(yi);
-	yImage.pixels[0].g = intToPixel(yi);
-	yImage.pixels[0].b = intToPixel(yi);
+	yImage.pixels[0].r = intToPixel(&yi);
+	yImage.pixels[0].g = intToPixel(&yi);
+	yImage.pixels[0].b = intToPixel(&yi);
 
 	yk = ((yRConst * rB + yGConst * gB + yBConst * bB) >> 23) + 16;
-	yImage.pixels[1].r = intToPixel(yk);
-	yImage.pixels[1].g = intToPixel(yk);
-	yImage.pixels[1].b = intToPixel(yk);
+	yImage.pixels[1].r = intToPixel(&yk);
+	yImage.pixels[1].g = intToPixel(&yk);
+	yImage.pixels[1].b = intToPixel(&yk);
 		
 	// Cb Values
 	cbA = (bA * cbBConst - rA * cbRConst - gA * cbGConstA);
@@ -110,8 +112,10 @@ void RGBtoYCC(char* filename)
 	cbGreenIntB = cbGreenIntB >> 23;
 		
 	cbImage.pixels[0].r = 0;
-	cbImage.pixels[0].g = intToPixel(cbGreenIntA + cbGreenIntB + 128);
-	cbImage.pixels[0].b = intToPixel(cbA + cbB + 128);
+	tempint = cbGreenIntA + cbGreenIntB + 128;
+	cbImage.pixels[0].g = intToPixel(&tempint);
+	tempint = cbA + cbB + 128;
+	cbImage.pixels[0].b = intToPixel(&tempint);
 
 	// Cr values
 	crA = (crRConst * rA - crGConstA * gA - crBConst * bA);
@@ -126,8 +130,10 @@ void RGBtoYCC(char* filename)
 	crGreenIntB = -(crB * crGConstB);
 	crGreenIntB = crGreenIntB >> 23;
 
-	crImage.pixels[0].r = intToPixel(crA + crB + 128);
-	crImage.pixels[0].g = intToPixel(crGreenIntA + crGreenIntB + 128);
+	tempint = crA + crB + 128;
+	crImage.pixels[0].r = intToPixel(&tempint);
+	tempint = crGreenIntA + crGreenIntB + 128;
+	crImage.pixels[0].g = intToPixel(&tempint);
 	crImage.pixels[0].b = 0;
 	
 
@@ -147,14 +153,14 @@ void RGBtoYCC(char* filename)
 	
 		// Y values
 		yi = ((yRConst * rA + yGConst * gA + yBConst * bA) >> 23) + 16;
-		yImage.pixels[i].r = intToPixel(yi);
-		yImage.pixels[i].g = intToPixel(yi);
-		yImage.pixels[i].b = intToPixel(yi);
+		yImage.pixels[i].r = intToPixel(&yi);
+		yImage.pixels[i].g = intToPixel(&yi);
+		yImage.pixels[i].b = intToPixel(&yi);
 
 		yk = ((yRConst * rB + yGConst * gB + yBConst * bB) >> 23) + 16;
-		yImage.pixels[k].r = intToPixel(yk);
-		yImage.pixels[k].g = intToPixel(yk);
-		yImage.pixels[k].b = intToPixel(yk);
+		yImage.pixels[k].r = intToPixel(&yk);
+		yImage.pixels[k].g = intToPixel(&yk);
+		yImage.pixels[k].b = intToPixel(&yk);
 		
 		// Cb Values
 		cbA = (bA * cbBConst - rA * cbRConst - gA * cbGConstA);
@@ -170,8 +176,10 @@ void RGBtoYCC(char* filename)
 		cbGreenIntB = cbGreenIntB >> 23;
 		
 		cbImage.pixels[chromaI].r = 0;
-		cbImage.pixels[chromaI].g = intToPixel(cbGreenIntA + cbGreenIntB + 128);
-		cbImage.pixels[chromaI].b = intToPixel(cbA + cbB + 128);
+		tempint = cbGreenIntA + cbGreenIntB + 128;
+		cbImage.pixels[chromaI].g = intToPixel(&tempint);
+		tempint = cbA + cbB + 128;
+		cbImage.pixels[chromaI].b = intToPixel(&tempint);
 
 		// Cr values
 		crA = (crRConst * rA - crGConstA * gA - crBConst * bA);
@@ -186,8 +194,10 @@ void RGBtoYCC(char* filename)
 		crGreenIntB = -(crB * crGConstB);
 		crGreenIntB = crGreenIntB >> 23;
 
-		crImage.pixels[chromaI].r = intToPixel(crA + crB + 128);
-		crImage.pixels[chromaI].g = intToPixel(crGreenIntA + crGreenIntB + 128);
+		tempint = crA + crB + 128;
+		crImage.pixels[chromaI].r = intToPixel(&tempint);
+		tempint = crGreenIntA + crGreenIntB + 128;
+		crImage.pixels[chromaI].g = intToPixel(&tempint);
 		crImage.pixels[chromaI].b = 0;
 	}	
 	
@@ -221,9 +231,9 @@ int YCCtoRGB(char* yfile, char* cbfile, char* crfile)
 		g = yImage.pixels[i].g + cbImage.pixels[i >> 1].g + crImage.pixels[i >> 1].g - 256 - 16;
 		b = yImage.pixels[i].b + cbImage.pixels[i >> 1].b - 128 - 16;
 
-		rgbImage.pixels[i].r = intToPixel(r);
-		rgbImage.pixels[i].g = intToPixel(g);
-		rgbImage.pixels[i].b = intToPixel(b);
+		rgbImage.pixels[i].r = intToPixel(&r);
+		rgbImage.pixels[i].g = intToPixel(&g);
+		rgbImage.pixels[i].b = intToPixel(&b);
 	}
 	
 	writeImage("outRGB.bmp", rgbImage);
