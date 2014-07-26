@@ -81,35 +81,35 @@ void RGBtoYCC(char* filename)
 		
 		// Cb Values
 		int cbA = (bA * cbBConst - rA * cbRConst - gA * cbGConstA);
-		cbA = cbA >> 23;
+		cbA = cbA >> 24;
 
 		int cbGreenIntA = -(cbA * cbGConstB);
-		cbGreenIntA = cbGreenIntA >> 24;
+		cbGreenIntA = cbGreenIntA >> 23;
 
 		int cbB = (bB * cbBConst - rB * cbRConst - gB * cbGConstA);
-		cbB = cbB >> 23;
+		cbB = cbB >> 24;
 
 		int cbGreenIntB = -(cbB * cbGConstB);
-		cbGreenIntB = cbGreenIntB >> 24;
+		cbGreenIntB = cbGreenIntB >> 23;
 		
 		cbImage.pixels[chromaI].r = 0;
 		cbImage.pixels[chromaI].g = intToPixel(cbGreenIntA + cbGreenIntB + 128);
-		cbImage.pixels[chromaI].b = intToPixel(((cbA + cbB) >> 1) + 128);
+		cbImage.pixels[chromaI].b = intToPixel(cbA + cbB + 128);
 
 		// Cr values
 		int crA = (crRConst * rA - crGConstA * gA - crBConst * bA);
-		crA = crA >> 23;
+		crA = crA >> 24;
 		
 		int crGreenIntA = -(crA * crGConstB);
-		crGreenIntA = crGreenIntA >> 24;
+		crGreenIntA = crGreenIntA >> 23;
 
 		int crB = (crRConst * rB - crGConstA * gB - crBConst * bB);
-		crB = crB >> 23;
+		crB = crB >> 24;
 		
 		int crGreenIntB = -(crB * crGConstB);
-		crGreenIntB = crGreenIntB >> 24;
+		crGreenIntB = crGreenIntB >> 23;
 
-		crImage.pixels[chromaI].r = intToPixel(((crA + crB) >> 1) + 128);
+		crImage.pixels[chromaI].r = intToPixel(crA + crB + 128);
 		crImage.pixels[chromaI].g = intToPixel(crGreenIntA + crGreenIntB + 128);
 		crImage.pixels[chromaI].b = 0;
 	}	
