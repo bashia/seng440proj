@@ -4,6 +4,21 @@
 #include "ImageIO.h"
 #include "matrixMult.h"
 
+
+#define yRConst 2498396
+#define yGConst 4904878
+#define yBConst 952566
+
+#define cbRConst 2498407
+#define cbGConstA 4904867
+#define cbGConstB 1437774
+#define cbBConst 7403274
+
+#define crRConst  5857443
+#define crGConstA 4904877
+#define crGConstB 4272902
+#define crBConst  952567
+
 unsigned char intToPixel(int integer)
 {
 	if(integer > 255)
@@ -22,19 +37,7 @@ unsigned char intToPixel(int integer)
 */
 void RGBtoYCC(char* filename)
 {	
-	int yRConst = 2498396;
-	int yGConst = 4904878;
-	int yBConst = 952566;
-
-	int cbRConst = 2498407;
-	int cbGConstA = 4904867;
-	int cbGConstB = 1437774;
-	int cbBConst = 7403274;
-
-	int crRConst =  5857443;
-	int crGConstA = 4904877;
-	int crGConstB = 4272902;
-	int crBConst =   952567;
+	
 
 	Image rgb = readImage(filename);
 	Image yImage;
