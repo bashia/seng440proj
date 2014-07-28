@@ -16,29 +16,6 @@
 #define crGConstB 4272902
 #define crBConst  952567
 
-unsigned char intToPixel(int integer)
-{
-	if(integer > 255)
-	{
-		return 255;
-	}
-	else if(integer < 0)
-	{
-		return 0;
-	}
-	return integer;
-}
-
-unsigned char satAdd(int* a, int* b)
-{
-
-}
-
-unsigned char satMult(int*a, int* b)
-{
-
-}
-
 /*
  Transforms an RGB image to YCbCr components. 
 */
@@ -105,13 +82,16 @@ void RGBtoYCC(char* filename)
 		yi = ((yRConst * rA + yGConst * gA + yBConst * bA) >> 23) + 16;
 		yk = ((yRConst * rB + yGConst * gB + yBConst * bB) >> 23) + 16;
 
-		yImage.pixels[i].r = intToPixel(yi);
-		yImage.pixels[i].g = intToPixel(yi);
-		yImage.pixels[i].b = intToPixel(yi);
+		asm("USAT %0, #8, %1" : "=r" (yi) : "r" (yi));
+		asm("USAT %0, #8, %1" : "=r" (yk) : "r" (yk));
 
-		yImage.pixels[k].r = intToPixel(yk);
-		yImage.pixels[k].g = intToPixel(yk);
-		yImage.pixels[k].b = intToPixel(yk);
+		yImage.pixels[i].r = yi;
+		yImage.pixels[i].g = yi;
+		yImage.pixels[i].b = yi;
+
+		yImage.pixels[k].r = yk;
+		yImage.pixels[k].g = yk;
+		yImage.pixels[k].b = yk;
 		
 		// Cb Values
 		cbA = (bA * cbBConst - rA * cbRConst - gA * cbGConstA);
@@ -126,9 +106,15 @@ void RGBtoYCC(char* filename)
 		cbGreenIntA = cbGreenIntA >> 23;
 		cbGreenIntB = cbGreenIntB >> 23;
 
+		int cbGreen = cbGreenIntA + cbGreenIntB + 128;
+		int cbBlue = cbA + cbB + 128;
+
+		asm("USAT %0, #8, %1" : "=r" (cbGreen) : "r" (cbGreen));
+		asm("USAT %0, #8, %1" : "=r" (cbBlue) : "r" (cbBlue));
+
 		cbImage.pixels[chromaI].r = 0;
-		cbImage.pixels[chromaI].g = intToPixel(cbGreenIntA + cbGreenIntB + 128);
-		cbImage.pixels[chromaI].b = intToPixel(cbA + cbB + 128);
+		cbImage.pixels[chromaI].g = cbGreen;
+		cbImage.pixels[chromaI].b = cbBlue;
 
 		// Cr values
 		crA = (crRConst * rA - crGConstA * gA - crBConst * bA);
@@ -143,9 +129,16 @@ void RGBtoYCC(char* filename)
 		crGreenIntA = crGreenIntA >> 23;
 		crGreenIntB = crGreenIntB >> 23;
 
-		crImage.pixels[chromaI].r = intToPixel(crA + crB + 128);
-		crImage.pixels[chromaI].g = intToPixel(crGreenIntA + crGreenIntB + 128);
+		int crRed = crA + crB + 128;
+		int crGreen = crGreenIntA + crGreenIntB + 128;
+
+		asm("USAT %0, #8, %1" : "=r" (crRed) : "r" (crRed));
+		asm("USAT %0, #8, %1" : "=r" (crGreen) : "r" (crGreen));
+
+		crImage.pixels[chromaI].r = crRed;
+		crImage.pixels[chromaI].g = crGreen;
 		crImage.pixels[chromaI].b = 0;
+
 	}	
 	
 	writeImage("outY.bmp", yImage);
@@ -181,9 +174,13 @@ int YCCtoRGB(char* yfile, char* cbfile, char* crfile)
 		g = yImage.pixels[i].g + cbImage.pixels[chromaI].g + crImage.pixels[chromaI].g - 272;
 		b = yImage.pixels[i].b + cbImage.pixels[chromaI].b - 144;
 
-		rgbImage.pixels[i].r = intToPixel(r);
-		rgbImage.pixels[i].g = intToPixel(g);
-		rgbImage.pixels[i].b = intToPixel(b);
+		asm("USAT %0, #8, %1" : "=r" (r) : "r" (r));
+		asm("USAT %0, #8, %1" : "=r" (g) : "r" (g));
+		asm("USAT %0, #8, %1" : "=r" (b) : "r" (b));
+
+		rgbImage.pixels[i].r = r;
+		rgbImage.pixels[i].g = g;
+		rgbImage.pixels[i].b = b;
 	}
 	
 	writeImage("outRGB.bmp", rgbImage);
@@ -197,7 +194,6 @@ int YCCtoRGB(char* yfile, char* cbfile, char* crfile)
 
 int main(int argc, char* argv[])
 {
-	
 	if(argc == 2)
 	{
 		printf("RGB to YCC...\n");
