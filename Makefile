@@ -1,5 +1,5 @@
 CC = arm-linux-gcc
-FLAGS = -static
+FLAGS = -static -march=armv6
 SRC = src
 BIN = bin
 
