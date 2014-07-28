@@ -31,7 +31,7 @@ unsigned char intToPixel(int integer)
 
 unsigned char satAdd(int* a, int* b)
 {
-	
+
 }
 
 unsigned char satMult(int*a, int* b)
@@ -84,6 +84,8 @@ void RGBtoYCC(char* filename)
 	int crGreenIntA;
 	int crB;
 	int crGreenIntB;
+
+	int tempint;
 	
 	int i;
 	for(i = 1; i < rgb.numPixels; i += 2)
@@ -101,43 +103,44 @@ void RGBtoYCC(char* filename)
 	
 		// Y values
 		yi = ((yRConst * rA + yGConst * gA + yBConst * bA) >> 23) + 16;
+		yk = ((yRConst * rB + yGConst * gB + yBConst * bB) >> 23) + 16;
+
 		yImage.pixels[i].r = intToPixel(yi);
 		yImage.pixels[i].g = intToPixel(yi);
 		yImage.pixels[i].b = intToPixel(yi);
 
-		yk = ((yRConst * rB + yGConst * gB + yBConst * bB) >> 23) + 16;
 		yImage.pixels[k].r = intToPixel(yk);
 		yImage.pixels[k].g = intToPixel(yk);
 		yImage.pixels[k].b = intToPixel(yk);
 		
 		// Cb Values
 		cbA = (bA * cbBConst - rA * cbRConst - gA * cbGConstA);
-		cbA = cbA >> 24;
-
-		cbGreenIntA = -(cbA * cbGConstB);
-		cbGreenIntA = cbGreenIntA >> 23;
-
 		cbB = (bB * cbBConst - rB * cbRConst - gB * cbGConstA);
+
+		cbA = cbA >> 24;
 		cbB = cbB >> 24;
 
+		cbGreenIntA = -(cbA * cbGConstB);
 		cbGreenIntB = -(cbB * cbGConstB);
+
+		cbGreenIntA = cbGreenIntA >> 23;
 		cbGreenIntB = cbGreenIntB >> 23;
-		
+
 		cbImage.pixels[chromaI].r = 0;
 		cbImage.pixels[chromaI].g = intToPixel(cbGreenIntA + cbGreenIntB + 128);
 		cbImage.pixels[chromaI].b = intToPixel(cbA + cbB + 128);
 
 		// Cr values
 		crA = (crRConst * rA - crGConstA * gA - crBConst * bA);
-		crA = crA >> 24;
-		
-		crGreenIntA = -(crA * crGConstB);
-		crGreenIntA = crGreenIntA >> 23;
-
 		crB = (crRConst * rB - crGConstA * gB - crBConst * bB);
+
+		crA = crA >> 24;
 		crB = crB >> 24;
 		
+		crGreenIntA = -(crA * crGConstB);
 		crGreenIntB = -(crB * crGConstB);
+
+		crGreenIntA = crGreenIntA >> 23;
 		crGreenIntB = crGreenIntB >> 23;
 
 		crImage.pixels[chromaI].r = intToPixel(crA + crB + 128);
@@ -167,13 +170,16 @@ int YCCtoRGB(char* yfile, char* cbfile, char* crfile)
 	int r;
 	int g;
 	int b;
+	int chromaI;
 
 	int i;
 	for(i = 0; i < yImage.numPixels; i++)
 	{
-		r = yImage.pixels[i].r + crImage.pixels[i >> 1].r - 128 - 16;
-		g = yImage.pixels[i].g + cbImage.pixels[i >> 1].g + crImage.pixels[i >> 1].g - 256 - 16;
-		b = yImage.pixels[i].b + cbImage.pixels[i >> 1].b - 128 - 16;
+		chromaI = i >> 1;
+		
+		r = yImage.pixels[i].r + crImage.pixels[chromaI].r - 144;
+		g = yImage.pixels[i].g + cbImage.pixels[chromaI].g + crImage.pixels[chromaI].g - 272;
+		b = yImage.pixels[i].b + cbImage.pixels[chromaI].b - 144;
 
 		rgbImage.pixels[i].r = intToPixel(r);
 		rgbImage.pixels[i].g = intToPixel(g);
