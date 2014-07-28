@@ -82,8 +82,8 @@ void RGBtoYCC(char* filename)
 	int crGreenIntA;
 	int crB;
 	int crGreenIntB;
-	int cbRed;
-	int cbGreen;
+	int crRed;
+	int crGreen;
 	
 	
 	for(i = 1; i < rgb.numPixels; i += 2)
@@ -128,8 +128,8 @@ void RGBtoYCC(char* filename)
 		cbGreenIntA = cbGreenIntA >> 23;
 		cbGreenIntB = cbGreenIntB >> 23;
 
-		int cbGreen = cbGreenIntA + cbGreenIntB + 128;
-		int cbBlue = cbA + cbB + 128;
+		cbGreen = cbGreenIntA + cbGreenIntB + 128;
+		cbBlue = cbA + cbB + 128;
 
 		asm("USAT %0, #8, %1" : "=r" (cbGreen) : "r" (cbGreen));
 		asm("USAT %0, #8, %1" : "=r" (cbBlue) : "r" (cbBlue));
@@ -151,8 +151,8 @@ void RGBtoYCC(char* filename)
 		crGreenIntA = crGreenIntA >> 23;
 		crGreenIntB = crGreenIntB >> 23;
 
-		int crRed = crA + crB + 128;
-		int crGreen = crGreenIntA + crGreenIntB + 128;
+		crRed = crA + crB + 128;
+		crGreen = crGreenIntA + crGreenIntB + 128;
 
 		asm("USAT %0, #8, %1" : "=r" (crRed) : "r" (crRed));
 		asm("USAT %0, #8, %1" : "=r" (crGreen) : "r" (crGreen));
