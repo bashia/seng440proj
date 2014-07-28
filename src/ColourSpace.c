@@ -1,3 +1,15 @@
+/*
+
+ Main file to do conversion between RGB and YCC
+
+ Jeff ten Have
+ Tony Bashi
+
+ SENG 440 Project
+ Summer 2014
+
+*/
+
 #include <stdlib.h>
 #include <stdio.h>
 #include "ImageIO.h"
@@ -26,21 +38,25 @@ void RGBtoYCC(char* filename)
 	Image cbImage;
 	Image crImage;
 
+	// Set up Y output image
 	yImage.pixels = (Pixel*) malloc(sizeof(Pixel) * rgb.numPixels);
 	yImage.numPixels = rgb.numPixels;
 	yImage.width = rgb.width;
 	yImage.height = rgb.height;
 
+	// Set up Cb output image
 	cbImage.pixels = (Pixel*) malloc(sizeof(Pixel) * rgb.numPixels);
 	cbImage.numPixels = (rgb.numPixels >> 1);
 	cbImage.width = (rgb.width >> 1);
 	cbImage.height = rgb.height;
 		
+	// Set up Cr output image
 	crImage.pixels = (Pixel*) malloc(sizeof(Pixel) * rgb.numPixels);
 	crImage.numPixels = (rgb.numPixels >> 1);
 	crImage.width = (rgb.width >> 1);
 	crImage.height = rgb.height;
 
+	int i;
 	int k;
 	int chromaI;
 
@@ -51,25 +67,31 @@ void RGBtoYCC(char* filename)
 	int rB;
 	int gB;
 	int bB;
+
 	int yi;
 	int yk;
+
 	int cbA;
 	int cbGreenIntA;
 	int cbB;
 	int cbGreenIntB;
+	int cbGreen;
+	int cbBlue;
+	
 	int crA;
 	int crGreenIntA;
 	int crB;
 	int crGreenIntB;
-
-	int tempint;
+	int cbRed;
+	int cbGreen;
 	
-	int i;
+	
 	for(i = 1; i < rgb.numPixels; i += 2)
 	{
 		k = i + 1;
 		chromaI = i >> 1;
 			
+		// Load pixel values
 		rA = rgb.pixels[i].r;
 		gA = rgb.pixels[i].g;
 		bA = rgb.pixels[i].b;
@@ -78,7 +100,7 @@ void RGBtoYCC(char* filename)
 		gB = rgb.pixels[k].g;
 		bB = rgb.pixels[k].b;
 	
-		// Y values
+		// Calculate Y values
 		yi = ((yRConst * rA + yGConst * gA + yBConst * bA) >> 23) + 16;
 		yk = ((yRConst * rB + yGConst * gB + yBConst * bB) >> 23) + 16;
 
@@ -93,7 +115,7 @@ void RGBtoYCC(char* filename)
 		yImage.pixels[k].g = yk;
 		yImage.pixels[k].b = yk;
 		
-		// Cb Values
+		// Calculate Cb Values
 		cbA = (bA * cbBConst - rA * cbRConst - gA * cbGConstA);
 		cbB = (bB * cbBConst - rB * cbRConst - gB * cbGConstA);
 
@@ -116,7 +138,7 @@ void RGBtoYCC(char* filename)
 		cbImage.pixels[chromaI].g = cbGreen;
 		cbImage.pixels[chromaI].b = cbBlue;
 
-		// Cr values
+		// Calculate Cr values
 		crA = (crRConst * rA - crGConstA * gA - crBConst * bA);
 		crB = (crRConst * rB - crGConstA * gB - crBConst * bB);
 
@@ -148,6 +170,9 @@ void RGBtoYCC(char* filename)
 	free(rgb.pixels);
 }
 
+/*
+ Transforms YCbCr components to an RGB Image. 
+*/
 int YCCtoRGB(char* yfile, char* cbfile, char* crfile)
 {
 	Image yImage = readImage(yfile);
@@ -160,16 +185,18 @@ int YCCtoRGB(char* yfile, char* cbfile, char* crfile)
 	rgbImage.height = yImage.height;
 	rgbImage.numPixels = yImage.numPixels;
 	
+	int i;
+	int chromaI;
+
 	int r;
 	int g;
 	int b;
-	int chromaI;
-
-	int i;
+	
 	for(i = 0; i < yImage.numPixels; i++)
 	{
 		chromaI = i >> 1;
 		
+		// Calculate RGB values
 		r = yImage.pixels[i].r + crImage.pixels[chromaI].r - 144;
 		g = yImage.pixels[i].g + cbImage.pixels[chromaI].g + crImage.pixels[chromaI].g - 272;
 		b = yImage.pixels[i].b + cbImage.pixels[chromaI].b - 144;

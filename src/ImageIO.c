@@ -2,8 +2,12 @@
 
  This file reads and writes bmp image files.
 	
+
+ Jeff ten Have
+ Tony Bashi
+
  SENG 440 Project
- July 19th, 2013
+ Summer 2014
  
 */
 
@@ -66,7 +70,5 @@ void writeImage(char* filename, Image image)
 	
 	free(image.pixels);
 	fclose(imageFile);
-
-
 }
 
