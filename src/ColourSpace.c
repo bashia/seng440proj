@@ -33,30 +33,7 @@
 */
 void RGBtoYCC(char* filename)
 {	
-	Image rgb = readImage(filename);
-	Image yImage;
-	Image cbImage;
-	Image crImage;
-
-	// Set up Y output image
-	yImage.pixels = (Pixel*) malloc(sizeof(Pixel) * rgb.numPixels);
-	yImage.numPixels = rgb.numPixels;
-	yImage.width = rgb.width;
-	yImage.height = rgb.height;
-
-	// Set up Cb output image
-	cbImage.pixels = (Pixel*) malloc(sizeof(Pixel) * rgb.numPixels);
-	cbImage.numPixels = (rgb.numPixels >> 1);
-	cbImage.width = (rgb.width >> 1);
-	cbImage.height = rgb.height;
-		
-	// Set up Cr output image
-	crImage.pixels = (Pixel*) malloc(sizeof(Pixel) * rgb.numPixels);
-	crImage.numPixels = (rgb.numPixels >> 1);
-	crImage.width = (rgb.width >> 1);
-	crImage.height = rgb.height;
-
-	int i;
+int i;
 	int k;
 	int chromaI;
 
@@ -84,7 +61,35 @@ void RGBtoYCC(char* filename)
 	int crGreenIntB;
 	int crRed;
 	int crGreen;
+
+	int chromaPixelNum;
+	int chromaWidth; 
+
+	Image rgb = readImage(filename);
+	Image yImage;
+	Image cbImage;
+	Image crImage;
 	
+	chromaPixelNum = rgb.numPixels >> 1;
+	chromaWidth = rgb.width >> 1;
+	
+	// Set up Y output image
+	yImage.pixels = (Pixel*) malloc(sizeof(Pixel) * rgb.numPixels);
+	yImage.numPixels = rgb.numPixels;
+	yImage.width = rgb.width;
+	yImage.height = rgb.height;
+
+	// Set up Cb output image
+	cbImage.pixels = (Pixel*) malloc(sizeof(Pixel) * rgb.numPixels);
+	cbImage.numPixels = chromaPixelNum;
+	cbImage.width = chromaWidth;
+	cbImage.height = rgb.height;
+		
+	// Set up Cr output image
+	crImage.pixels = (Pixel*) malloc(sizeof(Pixel) * rgb.numPixels);
+	crImage.numPixels = chromaPixelNum;
+	crImage.width = chromaWidth;
+	crImage.height = rgb.height;
 	
 	for(i = 1; i < rgb.numPixels; i += 2)
 	{
