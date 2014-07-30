@@ -42,9 +42,6 @@ RGBtoYCC:
 	str	r3, [fp, #-8]
 	ldr	r3, [fp, #-112]
 	mov	r2, r3
-
-	@ Removed	mov	r3, r2
-
 	mov	r3, r3, asl #1
 	add	r3, r3, r2
 	mov	r0, r3
@@ -59,9 +56,6 @@ RGBtoYCC:
 	str	r3, [fp, #-132]
 	ldr	r3, [fp, #-112]
 	mov	r2, r3
-
-	@ Removed mov	r3, r2
-
 	mov	r3, r3, asl #1
 	add	r3, r3, r2
 	mov	r0, r3
@@ -76,9 +70,6 @@ RGBtoYCC:
 	str	r3, [fp, #-148]
 	ldr	r3, [fp, #-112]
 	mov	r2, r3
-
-	@ Removed mov	r3, r2
-
 	mov	r3, r3, asl #1
 	add	r3, r3, r2
 	mov	r0, r3
@@ -107,39 +98,20 @@ RGBtoYCC:
 	mov	r3, r3, asl #1
 	add	r3, r3, r2
 	add	r3, r1, r3
-	mov r2, r3
+	mov     r2, r3
 	ldrb	r3, [r2, #2]
 	str	r3, [fp, #-92]
 	ldrb	r3, [r2, #1]
 	str	r3, [fp, #-88]
 	ldrb	r3, [r2, #0]
 	str	r3, [fp, #-84]
-
-	@ These instructions are unecessary
-	@ Removed ldr	r1, [fp, #-108]
-	@ Removed ldr	r2, [fp, #-104]
-	@ Removed mov	r3, r2
-	@ Removed mov	r3, r3, asl #1
-	@ Removed add	r3, r3, r2
-	@ Removed add	r3, r1, r3
-	@ Removed ldrb	r3, [r3, #1]
-	@ Removed str	r3, [fp, #-88]
-	@ Removed ldr	r1, [fp, #-108]
-	@ Removed ldr	r2, [fp, #-104]
-	@ Removed mov	r3, r2
-	@ Removed mov	r3, r3, asl #1
-	@ Removed add	r3, r3, r2
-	@ Removed add	r3, r1, r3
-	@ Removed ldrb	r3, [r3, #0]	
-	@ Removed str	r3, [fp, #-84]
-
 	ldr	r1, [fp, #-108]
 	ldr	r2, [fp, #-100]
 	mov	r3, r2
 	mov	r3, r3, asl #1
 	add	r3, r3, r2
 	add	r3, r1, r3
-	mov r2, r3
+	mov     r2, r3
 	ldrb	r3, [r2, #2]
 	str	r3, [fp, #-80]
 	ldrb	r3, [r2, #1]
@@ -147,66 +119,105 @@ RGBtoYCC:
 	ldrb	r3, [r2, #0]
 	str	r3, [fp, #-72]
 
-	@ These instructions are unecessary
-	@ Removed ldr	r1, [fp, #-108]
-	@ Removed ldr	r2, [fp, #-100]
-	@ Removed mov	r3, r2
-	@ Removed mov	r3, r3, asl #1
-	@ Removed add	r3, r3, r2
-	@ Removed add	r3, r1, r3
-	@ Removed ldrb	r3, [r3, #1]	@ zero_extendqisi2
-	@ Removed str	r3, [fp, #-76]
-	@ Removed ldr	r1, [fp, #-108]
-	@ Removed ldr	r2, [fp, #-100]
-	@ Removed mov	r3, r2
-	@ Removed mov	r3, r3, asl #1
-	@ Removed add	r3, r3, r2
-	@ Removed add	r3, r1, r3
-	@ Removed ldrb	r3, [r3, #0]	@ zero_extendqisi2
-	@ Removed str	r3, [fp, #-72]
-
+	@ Pack First RGB to one integer
+	ldr	r3, [fp, #-84]
+	ldr	r3, [fp, #-88]
+	mov	r3, r3, asl #8
+	add	r2, r2, r3
 	ldr	r2, [fp, #-92]
-	ldr	r3, .L5
-	mul	r1, r3, r2
-	ldr	r2, [fp, #-88]
-	ldr	r3, .L5+4
-	mul	r3, r3, r2
-	add	r1, r1, r3
-	ldr	r2, [fp, #-84]
-	ldr	r3, .L5+8
-	mul	r3, r3, r2
-	add	r3, r1, r3
-	mov	r3, r3, asr #23
-	add	r3, r3, #16
-	str	r3, [fp, #-68]
-	ldr	r2, [fp, #-80]
-	ldr	r3, .L5
-	mul	r1, r3, r2
-	ldr	r2, [fp, #-76]
-	ldr	r3, .L5+4
-	mul	r3, r3, r2
-	add	r1, r1, r3
-	ldr	r2, [fp, #-72]
-	ldr	r3, .L5+8
-	mul	r3, r3, r2
-	add	r3, r1, r3
-	mov	r3, r3, asr #23
-	add	r3, r3, #16
+	mov	r3, r3, asl #16
+	add	r2, r2, r3
 
-	@ Reversed order of USAT operations to avoid extra str/ldr
+	@ New Instruction
+	ycc	r2, r2   
+
+	@ Unpack and store first Y value to location [fp, #-172] (Assume this is available memory space)
+	mov r3, r2, asr #16
+	str r3, [fp, #-172] 
+	
+	@ Unpack and store first Cb value to location [fp, #-176] (Assume this is available memory space)
+	mov r3, r2, asl #16
+	mov r3, r2, asr #24
+	str r3, [fp, #-176] 	
+	
+	@ Unpack and store first Cr value to location [fp, #-180] (Assume this is available memory space)
+	mov r3, r2, asl #24
+	mov r3, r2, asr #24
+	str r3, [fp, #-180] 
+
+	@ Pack Second RGB to one integer
+	ldr	r2, [fp, #-72]
+	ldr	r3, [fp, #-76]
+	mov	r3, r3, asl #8
+	add	r2, r2, r3
+	ldr	r3, [fp, #-80]
+	mov	r3, r3, asl #16
+	add	r2, r2, r3
+
+	@ New Instruction
+	ycc	r2, r2   
+
+	@ Unpack and store second Y value to location [fp, #-184] (Assume this is available memory space)
+	mov r3, r2, asr #16
+	str r3, [fp, #-184] 
+	
+	@ Unpack and store second Cb value to location [fp, #-188] (Assume this is available memory space)
+	mov r3, r2, asl #16
+	mov r3, r2, asr #24
+	str r3, [fp, #-188] 	
+	
+	@ Unpack and store second Cr value to location [fp, #-192] (Assume this is available memory space)
+	mov r3, r2, asl #24
+	mov r3, r2, asr #24
+	str r3, [fp, #-192] 
+
+	@ Removed ldr	r2, [fp, #-92]
+	@ Removed ldr	r3, .L5
+	@ Removed mul	r1, r3, r2
+	@ Removed ldr	r2, [fp, #-88]
+	@ Removed ldr	r3, .L5+4
+	@ Removed mul	r3, r3, r2
+	@ Removed add	r1, r1, r3
+	@ Removed ldr	r2, [fp, #-84]
+	@ Removed ldr	r3, .L5+8
+	@ Removed mul	r3, r3, r2
+	@ Removed add	r3, r1, r3
+	@ Removed mov	r3, r3, asr #23
+	@ Removed add	r3, r3, #16
+	@ Removed str	r3, [fp, #-68]
+	@ Removed ldr	r2, [fp, #-80]
+	@ Removed ldr	r3, .L5
+	@ Removed mul	r1, r3, r2
+	@ Removed ldr	r2, [fp, #-76]
+	@ Removed ldr	r3, .L5+4
+	@ Removed mul	r3, r3, r2
+	@ Removed add	r1, r1, r3
+	@ Removed ldr	r2, [fp, #-72]
+	@ Removed ldr	r3, .L5+8
+	@ Removed mul	r3, r3, r2
+	@ Removed add	r3, r1, r3
+	@ Removed mov	r3, r3, asr #23
+	@ Removed add	r3, r3, #16
+
+	@ Added instruction to load correct Y value
+	ldr r3, [fp, #-172]
+
 #APP
 @ 113 "src/ColourSpace.c" 1
 	USAT r3, #8, r3
 @ 0 "" 2
 
-	str	r3, [fp, #-64]
-	ldr	r3, [fp, #-68]
+	@ Changed instructions to store/load from correct locations
+	str	r3, [fp, #-172]
+	ldr	r3, [fp, #-184]
 
 #APP
 @ 112 "src/ColourSpace.c" 1
 	USAT r3, #8, r3
 @ 0 "" 2
-	str	r3, [fp, #-68]
+	
+	@ Changed instruction to store/load from correct location
+	str	r3, [fp, #-184]
 
 	ldr	r1, [fp, #-124]
 	ldr	r2, [fp, #-104]
@@ -214,31 +225,14 @@ RGBtoYCC:
 	mov	r3, r3, asl #1
 	add	r3, r3, r2
 	add	r2, r1, r3
-	ldr	r3, [fp, #-68]
+	
+	@ Changed instruction to store/load from correct location
+	ldr	r3, [fp, #-172]
+
 	uxtb	r3, r3
 	strb	r3, [r2, #2]
 	strb	r3, [r2, #1]
 	strb	r3, [r2, #0]
-
-	@ These instructions are unecessary
-	@ Removed ldr	r1, [fp, #-124]
-	@ Removed ldr	r2, [fp, #-104]
-	@ Removed mov	r3, r2
-	@ Removed mov	r3, r3, asl #1
-	@ Removed add	r3, r3, r2
-	@ Removed add	r2, r1, r3
-	@ Removed ldr	r3, [fp, #-68]
-	@ Removed uxtb	r3, r3
-	@ Removed strb	r3, [r2, #1]
-	@ Removed ldr	r1, [fp, #-124]
-	@ Removed ldr	r2, [fp, #-104]
-	@ Removed mov	r3, r2
-	@ Removed mov	r3, r3, asl #1
-	@ Removed add	r3, r3, r2
-	@ Removed add	r2, r1, r3
-	@ Removed ldr	r3, [fp, #-68]
-	@ Removed uxtb	r3, r3
-	@ Removed strb	r3, [r2, #0]
 
 	ldr	r1, [fp, #-124]
 	ldr	r2, [fp, #-100]
@@ -246,86 +240,57 @@ RGBtoYCC:
 	mov	r3, r3, asl #1
 	add	r3, r3, r2
 	add	r2, r1, r3
-	ldr	r3, [fp, #-64]
+	
+	@ Changed instruction to store/load from correct location
+	ldr	r3, [fp, #-184]
+
 	uxtb	r3, r3
 	strb	r3, [r2, #2]
 	strb	r3, [r2, #1]
 	strb	r3, [r2, #0]
 
-	@ These instructions are unecessary
-	@ Removed ldr	r1, [fp, #-124]
-	@ Removed ldr	r2, [fp, #-100]
-	@ Removed mov	r3, r2
-	@ Removed mov	r3, r3, asl #1
-	@ Removed add	r3, r3, r2
-	@ Removed add	r2, r1, r3
-	@ Removed ldr	r3, [fp, #-64]
-	@ Removed uxtb	r3, r3
-	@ Removed strb	r3, [r2, #1]
-	@ Removed ldr	r1, [fp, #-124]
-	@ Removed ldr	r2, [fp, #-100]
-	@ Removed mov	r3, r2
-	@ Removed mov	r3, r3, asl #1
-	@ Removed add	r3, r3, r2
-	@ Removed add	r2, r1, r3
-	@ Removed ldr	r3, [fp, #-64]
-	@ Removed uxtb	r3, r3
-	@ Removed strb	r3, [r2, #0]
-
-	ldr	r2, [fp, #-84]
-	ldr	r3, .L5+12
-	mul	r1, r3, r2
-	ldr	r2, [fp, #-92]
-	ldr	r3, .L5+16
-	mul	r3, r3, r2
-	add	r1, r1, r3
-	ldr	r2, [fp, #-88]
-	ldr	r3, .L5+20
-	mul	r3, r3, r2
-	add	r3, r1, r3
-	mov	r3, r3, asr #24
-	str	r3, [fp, #-60]
-	ldr	r2, [fp, #-72]
-	ldr	r3, .L5+12
-	mul	r1, r3, r2
-	ldr	r2, [fp, #-80]
-	ldr	r3, .L5+16
-	mul	r3, r3, r2
-	add	r1, r1, r3
-	ldr	r2, [fp, #-76]
-	ldr	r3, .L5+20
-	mul	r3, r3, r2
-	add	r3, r1, r3
-	mov	r3, r3, asr #24
-	str	r3, [fp, #-52]
-
-	@ Moved these shifts to calculations above
-	@ Removed ldr	r3, [fp, #-60]
+	@ Removed ldr	r2, [fp, #-84]
+	@ Removed ldr	r3, .L5+12
+	@ Removed mul	r1, r3, r2
+	@ Removed ldr	r2, [fp, #-92]
+	@ Removed ldr	r3, .L5+16
+	@ Removed mul	r3, r3, r2
+	@ Removed add	r1, r1, r3
+	@ Removed ldr	r2, [fp, #-88]
+	@ Removed ldr	r3, .L5+20
+	@ Removed mul	r3, r3, r2
+	@ Removed add	r3, r1, r3
 	@ Removed mov	r3, r3, asr #24
 	@ Removed str	r3, [fp, #-60]
-	@ Removed ldr	r3, [fp, #-52]
+	@ Removed ldr	r2, [fp, #-72]
+	@ Removed ldr	r3, .L5+12
+	@ Removed mul	r1, r3, r2
+	@ Removed ldr	r2, [fp, #-80]
+	@ Removed ldr	r3, .L5+16
+	@ Removed mul	r3, r3, r2
+	@ Removed add	r1, r1, r3
+	@ Removed ldr	r2, [fp, #-76]
+	@ Removed ldr	r3, .L5+20
+	@ Removed mul	r3, r3, r2
+	@ Removed add	r3, r1, r3
 	@ Removed mov	r3, r3, asr #24
 	@ Removed str	r3, [fp, #-52]
 
-	ldr	r2, [fp, #-60]
+	@ Changed instruction to store/load from correct location
+	ldr	r2, [fp, #-176]
+
 	ldr	r3, .L5+24
 	mul	r3, r3, r2
 	mov 	r3, r3, asr #23
 	str	r3, [fp, #-56]
-	ldr	r2, [fp, #-52]
+
+	@ Changed instruction to store/load from correct location
+	ldr	r2, [fp, #-188]
+
 	ldr	r3, .L5+24
 	mul	r3, r3, r2
 	mov	r3, r3, asr #23
 	str	r3, [fp, #-48]
-
-	@ Moved these shifts to calculations above
-	@ Removed ldr	r3, [fp, #-56]
-	@ Removed mov	r3, r3, asr #23
-	@ Removed str	r3, [fp, #-56]
-	@ Removed ldr	r3, [fp, #-48]
-	@ Removed mov	r3, r3, asr #23
-	@ Removed str	r3, [fp, #-48]
-
 	ldr	r2, [fp, #-56]
 	ldr	r3, [fp, #-48]
 	add	r3, r2, r3
@@ -335,8 +300,6 @@ RGBtoYCC:
 	ldr	r3, [fp, #-52]
 	add	r3, r2, r3
 	add	r3, r3, #128
-
-	@ Reversed order of USAT operations to avoid extra str/ldr
 #APP
 @ 140 "src/ColourSpace.c" 1
 	USAT r3, #8, r3
@@ -349,7 +312,6 @@ RGBtoYCC:
 	USAT r3, #8, r3
 @ 0 "" 2
 	str	r3, [fp, #-44]
-
 	ldr	r1, [fp, #-140]
 	ldr	r2, [fp, #-96]
 	mov	r3, r2
@@ -366,80 +328,47 @@ RGBtoYCC:
 	uxtb	r3, r3
 	strb	r3, [r1, #0]
 
-	@ These instructions are unecessary
-	@ Removed str	ldr	r1, [fp, #-140]
-	@ Removed str	ldr	r2, [fp, #-96]
-	@ Removed str	mov	r3, r2
-	@ Removed str	mov	r3, r3, asl #1
-	@ Removed str	add	r3, r3, r2
-	@ Removed str	add	r2, r1, r3
-	@ Removed ldr	r3, [fp, #-44]
-	@ Removed uxtb	r3, r3
-	@ Removed strb	r3, [r2, #1]
-	@ Removed ldr	r1, [fp, #-140]
-	@ Removed ldr	r2, [fp, #-96]
-	@ Removed mov	r3, r2
-	@ Removed mov	r3, r3, asl #1
-	@ Removed add	r3, r3, r2
-	@ Removed add	r2, r1, r3
-	@ Removed ldr	r3, [fp, #-40]
-	@ Removed uxtb	r3, r3
-	@ Removed strb	r3, [r2, #0]
-
-	ldr	r2, [fp, #-92]
-	ldr	r3, .L5+28
-	mul	r1, r3, r2
-	ldr	r2, [fp, #-88]
-	ldr	r3, .L5+32
-	mul	r3, r3, r2
-	add	r1, r1, r3
-	ldr	r2, [fp, #-84]
-	ldr	r3, .L5+36
-	mul	r3, r3, r2
-	add	r3, r1, r3
-	mov	r3, r3, asr #24
-	str	r3, [fp, #-36]
-	ldr	r2, [fp, #-80]
-	ldr	r3, .L5+28
-	mul	r1, r3, r2
-	ldr	r2, [fp, #-76]
-	ldr	r3, .L5+32
-	mul	r3, r3, r2
-	add	r1, r1, r3
-	ldr	r2, [fp, #-72]
-	ldr	r3, .L5+36
-	mul	r3, r3, r2
-	add	r3, r1, r3
-	mov	r3, r3, asr #24
-	str	r3, [fp, #-28]
-
-	@ Moved these shifts to calulations above
-	@ Removed ldr	r3, [fp, #-36]
+	@ Removed ldr	r2, [fp, #-92]
+	@ Removed ldr	r3, .L5+28
+	@ Removed mul	r1, r3, r2
+	@ Removed ldr	r2, [fp, #-88]
+	@ Removed ldr	r3, .L5+32
+	@ Removed mul	r3, r3, r2
+	@ Removed add	r1, r1, r3
+	@ Removed ldr	r2, [fp, #-84]
+	@ Removed ldr	r3, .L5+36
+	@ Removed mul	r3, r3, r2
+	@ Removed add	r3, r1, r3
 	@ Removed mov	r3, r3, asr #24
 	@ Removed str	r3, [fp, #-36]
-	@ Removed ldr	r3, [fp, #-28]
+	@ Removed ldr	r2, [fp, #-80]
+	@ Removed ldr	r3, .L5+28
+	@ Removed mul	r1, r3, r2
+	@ Removed ldr	r2, [fp, #-76]
+	@ Removed ldr	r3, .L5+32
+	@ Removed mul	r3, r3, r2
+	@ Removed add	r1, r1, r3
+	@ Removed ldr	r2, [fp, #-72]
+	@ Removed ldr	r3, .L5+36
+	@ Removed mul	r3, r3, r2
+	@ Removed add	r3, r1, r3
 	@ Removed mov	r3, r3, asr #24
 	@ Removed str	r3, [fp, #-28]
 
-	ldr	r2, [fp, #-36]
+	@ Changed instruction to store/load from correct location
+	ldr	r2, [fp, #-180]
+	
 	ldr	r3, .L5+40
 	mul	r3, r3, r2
 	mov	r3, r3, asr #23
 	str	r3, [fp, #-32]
-	ldr	r2, [fp, #-28]
+
+	@ Changed instruction to store/load from correct location
+	ldr	r2, [fp, #-192]
 	ldr	r3, .L5+40
 	mul	r3, r3, r2
 	mov	r3, r3, asr #23
 	str	r3, [fp, #-24]
-
-	@ Moved these shifts to calulations above
-	@ Removed ldr	r3, [fp, #-32]
-	@ Removed mov	r3, r3, asr #23
-	@ Removed str	r3, [fp, #-32]
-	@ Removed ldr	r3, [fp, #-24]
-	@ Removed mov	r3, r3, asr #23
-	@ Removed str	r3, [fp, #-24]
-
 	ldr	r2, [fp, #-36]
 	ldr	r3, [fp, #-28]
 	add	r3, r2, r3
@@ -449,8 +378,6 @@ RGBtoYCC:
 	ldr	r3, [fp, #-24]
 	add	r3, r2, r3
 	add	r3, r3, #128
-
-	@ Reversed order of USAT operations to avoid extra str/ldr
 #APP
 @ 163 "src/ColourSpace.c" 1
 	USAT r3, #8, r3
@@ -462,14 +389,12 @@ RGBtoYCC:
 	USAT r3, #8, r3
 @ 0 "" 2
 	str	r3, [fp, #-20]
-
 	ldr	r1, [fp, #-156]
 	ldr	r2, [fp, #-96]
 	mov	r3, r2
 	mov	r3, r3, asl #1
 	add	r3, r3, r2
 	add	r2, r1, r3
-
 	mov r1, r2
 	ldr	r3, [fp, #-20]
 	uxtb	r3, r3
@@ -479,26 +404,6 @@ RGBtoYCC:
 	strb	r3, [r2, #1]
 	mov	r3, #0
 	strb	r3, [r2, #0]
-
-	@ These instructions are unecessary
-	@ Removed ldr	r1, [fp, #-156]
-	@ Removed ldr	r2, [fp, #-96]
-	@ Removed mov	r3, r2
-	@ Removed mov	r3, r3, asl #1
-	@ Removed add	r3, r3, r2
-	@ Removed add	r2, r1, r3
-	@ Removed ldr	r3, [fp, #-16]
-	@ Removed uxtb	r3, r3
-	@ Removed strb	r3, [r2, #1]
-	@ Removed ldr	r1, [fp, #-156]
-	@ Removed ldr	r2, [fp, #-96]
-	@ Removed mov	r3, r2
-	@ Removed mov	r3, r3, asl #1
-	@ Removed add	r3, r3, r2
-	@ Removed add	r2, r1, r3
-	@ Removed mov	r3, #0
-	@ Removed strb	r3, [r2, #0]
-
 	ldr	r3, [fp, #-104]
 	add	r3, r3, #2
 	str	r3, [fp, #-104]
@@ -579,9 +484,6 @@ YCCtoRGB:
 	bl	readImage
 	ldr	r3, [fp, #-32]
 	mov	r2, r3
-	
-	@ Removed mov	r3, r2
-
 	mov	r3, r3, asl #1
 	add	r3, r3, r2
 	mov	r0, r3
@@ -621,17 +523,8 @@ YCCtoRGB:
 	add	r3, r0, r3
 	sub	r3, r3, #144
 	str	r3, [fp, #-16]
-
-	@ Removed uncessecary instructions
-	@ Removed ldr	r1, [fp, #-28]
-	@ Removed ldr	r2, [fp, #-24]
-	@ Removed mov	r3, r2
-	@ Removed mov	r3, r3, asl #1
-	@ Removed add	r3, r3, r2
-	@ Removed add	r3, r1, r3
 	ldrb	r3, [r4, #1]
 	mov	r0, r3
-
 	ldr	r1, [fp, #-44]
 	ldr	r2, [fp, #-20]
 	mov	r3, r2
@@ -641,46 +534,19 @@ YCCtoRGB:
 	mov 	r6, r3
 	ldrb	r3, [r3, #1]
 	add	r0, r0, r3
-
-	@ Removed uncessecary instructions
-	@ Removed ldr	r1, [fp, #-60]
-	@ Removed ldr	r2, [fp, #-20]
-	@ Removed mov	r3, r2
-	@ Removed mov	r3, r3, asl #1
-	@ Removed add	r3, r3, r2
-	@ Removed add	r3, r1, r3
 	ldrb	r3, [r5, #1]
 	add	r3, r0, r3
 	sub	r3, r3, #272
 	str	r3, [fp, #-12]
-
-	@ Removed uncessecary instructions
-	@ Removed ldr	r1, [fp, #-28]
-	@ Removed ldr	r2, [fp, #-24]
-	@ Removed mov	r3, r2
-	@ Removed mov	r3, r3, asl #1
-	@ Removed add	r3, r3, r2
-	@ Removed add	r3, r1, r3
 	ldrb	r3, [r4, #0]
 	mov	r0, r3
-
-	@ Removed uncessecary instructions
-	@ Removed ldr	r1, [fp, #-44]
-	@ Removed ldr	r2, [fp, #-20]
-	@ Removed mov	r3, r2
-	@ Removed mov	r3, r3, asl #1
-	@ Removed add	r3, r3, r2
-	@ Removed add	r3, r1, r3
 	ldrb	r3, [r6, #0]
 	add	r3, r0, r3
 	sub	r3, r3, #144
-
-	@ Reversed order of USAT operations to avoid extra str/ldr
 #APP
 @ 211 "src/ColourSpace.c" 1
 	USAT r3, #8, r3
 @ 0 "" 2
-
 	str	r3, [fp, #-8]
 	ldr	r3, [fp, #-16]
 #APP
@@ -694,7 +560,6 @@ YCCtoRGB:
 	USAT r3, #8, r3
 @ 0 "" 2
 	str	r3, [fp, #-12]
-
 	ldr	r1, [fp, #-76]
 	ldr	r2, [fp, #-24]
 	mov	r3, r2
@@ -705,29 +570,12 @@ YCCtoRGB:
 	ldr	r3, [fp, #-16]
 	uxtb	r3, r3
 	strb	r3, [r1, #2]
-
-	@ Removed uncessecary instructions
-	@ Removed ldr	r1, [fp, #-76]
-	@ Removed ldr	r2, [fp, #-24]
-	@ Removed mov	r3, r2
-	@ Removed mov	r3, r3, asl #1
-	@ Removed add	r3, r3, r2
-	@ Removed add	r2, r1, r3
 	ldr	r3, [fp, #-12]
 	uxtb	r3, r3
 	strb	r3, [r1, #1]
-
-	@ Removed uncessecary instructions
-	@ Removed ldr	r1, [fp, #-76]
-	@ Removed ldr	r2, [fp, #-24]
-	@ Removed mov	r3, r2
-	@ Removed mov	r3, r3, asl #1
-	@ Removed add	r3, r3, r2
-	@ Removed add	r2, r1, r3
 	ldr	r3, [fp, #-8]
 	uxtb	r3, r3
 	strb	r3, [r1, #0]
-
 	ldr	r3, [fp, #-24]
 	add	r3, r3, #1
 	str	r3, [fp, #-24]
