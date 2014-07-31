@@ -40,18 +40,21 @@ architecture Behavioral of RGBtoYCC is
 begin
 	r <= unsigned(inport(23 downto 16));
 	g <= unsigned(inport(15 downto 8));
-	b <= unsigned(inport(7 downto 0));
+	b <= unsigned(inport(7 downto 0));	
 
    y <= shift_right((unsigned(yRConst) * r + unsigned(yGConst) * g + unsigned(yBConst) * b) ,23) + 16;
    cb <= shift_right((b * unsigned(cbBConst) - r * unsigned(cbRConst) - g * unsigned(cbGConstA)), 24);
    cr <= shift_right((unsigned(crRConst) * r - unsigned(crGConstA) * g - unsigned(crBConst) * b), 24);
 	
-	outport(23 downto 16) <= std_logic_vector(y);
-	outport(15 downto 8) <= std_logic_vector(cb);
-	outport(7 downto 0) <= std_logic_vector(cr);
 
     process(clk)
     begin
+
+	
+	outport(31 downto 24) <= x"00";
+	outport(23 downto 16) <= std_logic_vector(y);
+	outport(15 downto 8) <= std_logic_vector(cb);
+	outport(7 downto 0) <= std_logic_vector(cr);
          
     end process;
 

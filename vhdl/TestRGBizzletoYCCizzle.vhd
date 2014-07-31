@@ -83,8 +83,6 @@ BEGIN
       -- hold reset state for 100 ns.
       wait for 100 ns;	
 
-      wait for clk_period*10;
-
       inport <= x"000F0F0F";
 		wait for clk_period;
 		inport <= x"001E1E1E";
