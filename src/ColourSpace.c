@@ -33,7 +33,7 @@
 */
 void RGBtoYCC(char* filename)
 {	
-int i;
+	int i;
 	int k;
 	int chromaI;
 
