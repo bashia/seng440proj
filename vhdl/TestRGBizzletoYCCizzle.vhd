@@ -56,7 +56,7 @@ ARCHITECTURE behavior OF TestRGBizzletoYCCizzle IS
    signal outport : std_logic_vector(31 downto 0);
 
    -- Clock period definitions
-   constant clk_period : time := 100 ns;
+   constant clk_period : time :=50 ns;
  
 BEGIN
  
