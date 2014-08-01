@@ -4,7 +4,7 @@
 --
 -- Create Date:   20:08:06 07/30/2014
 -- Design Name:   
--- Module Name:   /home/bashia/RGBtoYCC/TestRGBizzletoYCCizzle.vhd
+-- Module Name:   /home/bashia/RGBtoYCC/TestRGBtoYCC.vhd
 -- Project Name:  RGBtoYCC
 -- Target Device:  
 -- Tool versions:  
@@ -32,10 +32,10 @@ USE ieee.std_logic_1164.ALL;
 -- arithmetic functions with Signed or Unsigned values
 --USE ieee.numeric_std.ALL;
  
-ENTITY TestRGBizzletoYCCizzle IS
-END TestRGBizzletoYCCizzle;
+ENTITY TestRGBtoYCC IS
+END TestRGBtoYCC;
  
-ARCHITECTURE behavior OF TestRGBizzletoYCCizzle IS 
+ARCHITECTURE behavior OF TestRGBtoYCC IS 
  
     -- Component Declaration for the Unit Under Test (UUT)
  
