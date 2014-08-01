@@ -27,7 +27,7 @@ Running The Executable -
 	for the RGB to YCC conversion. To view this image use the 'eog outRGB.bmp' command.
 
 ******************************************************************************************************************************
-File Structure -
+File Structure - 
 
 	/arm - Contains the optimized ARM code files. These files are compiled using 'make armc'.
 
